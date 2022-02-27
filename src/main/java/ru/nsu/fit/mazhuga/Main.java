@@ -1,14 +1,20 @@
 package ru.nsu.fit.mazhuga;
 
-import org.apache.commons.cli.*;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+
+import java.util.Comparator;
 
 public class Main {
 
-    public static final String DEFAULT_FILE_PATH = "RU-NVS.osm.bz2";
+    private static final String DEFAULT_FILE_PATH = "RU-NVS.osm.bz2";
 
-    public static void main(String[] args) throws ParseException {
+    private static final int PRINT_ENTRIES_LIMIT = 10;
 
-        Options options = new Options();
+    public static void main(String[] args) throws Exception {
+
+        final var options = new Options();
         options.addOption(
                 Option.builder("file")
                         .argName("path")
@@ -16,19 +22,41 @@ public class Main {
                         .desc("load an archived file with osm data")
                         .build());
 
-        CommandLineParser parser = new DefaultParser();
+        final var commandParser = new DefaultParser();
+        final var commandLine = commandParser.parse(options, args);
 
-        CommandLine line = parser.parse(options, args);
+        if (commandLine.hasOption("file")) {
 
-        if (line.hasOption("file")) {
+            String pathString = commandLine.getOptionValue("file");
 
-            String path = line.getOptionValue("file");
-
-            if (path == null) {
-                path = DEFAULT_FILE_PATH;
+            if (pathString == null) {
+                pathString = DEFAULT_FILE_PATH;
             }
 
-            System.out.println(path);
+            String outputPathString = pathString.replace(".bz2", "");
+
+            System.out.println(pathString);
+
+            final var decompressor = new Decompressor();
+            final var parser = new NodeParser();
+
+            decompressor.decompress(pathString, outputPathString);
+
+            var parsingResult = parser.parse(outputPathString);
+
+            System.out.println();
+            System.out.println("=== Top " + PRINT_ENTRIES_LIMIT + " USERS by edits ===");
+            parsingResult.getUserDataList().stream()
+                    .sorted(Comparator.comparing(ParsingResult.UserData::getEditsCount).reversed())
+                    .limit(PRINT_ENTRIES_LIMIT)
+                    .forEachOrdered(it -> System.out.println("Name: " + it.getName() + " Edits: " + it.getEditsCount()));
+
+            System.out.println();
+            System.out.println("=== Top " + PRINT_ENTRIES_LIMIT + " NODES by edits ===");
+            parsingResult.getNodeDataList().stream()
+                    .sorted(Comparator.comparing(ParsingResult.NodeData::getEditsCount).reversed())
+                    .limit(PRINT_ENTRIES_LIMIT)
+                    .forEachOrdered(it -> System.out.println("Id: " + it.getId() + " Edits: " + it.getEditsCount()));
         }
 
     }
