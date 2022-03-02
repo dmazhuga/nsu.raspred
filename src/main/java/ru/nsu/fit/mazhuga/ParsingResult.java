@@ -26,7 +26,7 @@ public class ParsingResult {
     @AllArgsConstructor
     static class NodeData {
 
-        private long id;
+        private String name;
 
         private long editsCount;
     }

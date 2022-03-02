@@ -23,7 +23,7 @@ public class Service {
 
         String outputPathString = pathString.replace(".bz2", "");
 
-        decompressor.decompress(pathString, outputPathString);
+        //decompressor.decompress(pathString, outputPathString);
 
         var parsingResult = parser.parse(outputPathString);
 
@@ -37,7 +37,7 @@ public class Service {
         parsingResult.getNodeDataList().stream()
                 .sorted(Comparator.comparing(ParsingResult.NodeData::getEditsCount).reversed())
                 .limit(PRINT_ENTRIES_LIMIT)
-                .forEachOrdered(it -> log.info("Id: " + it.getId() + " Edits: " + it.getEditsCount()));
+                .forEachOrdered(it -> log.info("Name: " + it.getName() + " Edits: " + it.getEditsCount()));
 
     }
 }
