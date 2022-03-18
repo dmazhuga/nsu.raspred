@@ -12,7 +12,6 @@ public class Service {
     private static final String DEFAULT_FILE_PATH = "RU-NVS.osm.bz2";
     private static final int PRINT_ENTRIES_LIMIT = 10;
 
-    private final Decompressor decompressor;
     private final NodeParser parser;
 
     void parseData(String pathString) throws Exception {
@@ -21,11 +20,7 @@ public class Service {
             pathString = DEFAULT_FILE_PATH;
         }
 
-        String outputPathString = pathString.replace(".bz2", "");
-
-        //decompressor.decompress(pathString, outputPathString);
-
-        var parsingResult = parser.parse(outputPathString);
+        var parsingResult = parser.parseCompressed(pathString);
 
         log.info("=== Top " + PRINT_ENTRIES_LIMIT + " USERS by edits ===");
         parsingResult.getUserDataList().stream()

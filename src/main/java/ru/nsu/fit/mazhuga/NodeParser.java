@@ -1,10 +1,15 @@
 package ru.nsu.fit.mazhuga;
 
+import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
+
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
-import java.io.FileInputStream;
+import java.io.BufferedInputStream;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,18 +26,24 @@ public class NodeParser {
 
     private static final String TAG_KEY_NAME = "name";
 
+    // TODO: should be injected
     private final XMLInputFactory xmlInputFactory;
 
     public NodeParser() {
         xmlInputFactory = XMLInputFactory.newInstance();
     }
 
-    public ParsingResult parse(String pathString) throws Exception {
+    public ParsingResult parseCompressed(String pathString) throws Exception {
+        return parse(new BZip2CompressorInputStream(
+                new BufferedInputStream(Files.newInputStream(Paths.get(pathString)))));
+    }
+
+    public ParsingResult parse(InputStream inputStream) throws Exception {
 
         final var userEditsMap = new HashMap<String, Long>();
         final var nodeEditsMap = new HashMap<String, Long>();
 
-        final var reader = xmlInputFactory.createXMLEventReader(new FileInputStream(pathString));
+        final var reader = xmlInputFactory.createXMLEventReader(inputStream);
 
         while (reader.hasNext()) {
             XMLEvent nextEvent = reader.nextEvent();

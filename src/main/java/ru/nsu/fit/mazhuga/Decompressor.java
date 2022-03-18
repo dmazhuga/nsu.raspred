@@ -8,6 +8,10 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+/**
+ * @deprecated use {@link NodeParser#parseCompressed(java.lang.String)}
+ */
+@Deprecated
 public class Decompressor {
 
     public static final int BUFFER_SIZE = 1024 * 1024 * 25;

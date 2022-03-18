@@ -23,9 +23,8 @@ public class Main {
 
             String pathString = commandLine.getOptionValue("file");
 
-            final var decompressor = new Decompressor();
             final var parser = new NodeParser();
-            final var service = new Service(decompressor, parser);
+            final var service = new Service(parser);
 
             service.parseData(pathString);
         }
